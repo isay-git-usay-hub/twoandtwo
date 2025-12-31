@@ -1,0 +1,312 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-50 text-gray-900 transition-colors duration-200;
+}
+
+/* Dark Mode Styles */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #020617;
+  color: #f3f4f6;
+}
+
+/* Backgrounds */
+.dark .bg-white {
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+}
+
+.dark .bg-gray-50 {
+  background-color: #020617;
+}
+
+.dark .bg-gray-100 {
+  background-color: #1e293b;
+}
+
+.dark .bg-blue-50 {
+  background-color: rgba(23, 37, 84, 0.5);
+}
+
+.dark .bg-green-50 {
+  background-color: rgba(20, 83, 45, 0.5);
+}
+
+.dark .bg-yellow-50 {
+  background-color: rgba(66, 32, 6, 0.5);
+}
+
+.dark .bg-red-50 {
+  background-color: rgba(69, 10, 10, 0.5);
+}
+
+.dark .bg-orange-50 {
+  background-color: rgba(67, 20, 7, 0.5);
+}
+
+/* Text Colors */
+.dark .text-gray-900 {
+  color: #f9fafb;
+}
+
+.dark .text-gray-800 {
+  color: #f3f4f6;
+}
+
+.dark .text-gray-700 {
+  color: #e5e7eb;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af;
+}
+
+.dark .text-blue-800 {
+  color: #bfdbfe;
+}
+
+.dark .text-green-800 {
+  color: #bbf7d0;
+}
+
+.dark .text-yellow-800 {
+  color: #fef08a;
+}
+
+.dark .text-red-800 {
+  color: #fecaca;
+}
+
+.dark .text-orange-800 {
+  color: #fed7aa;
+}
+
+/* Borders */
+.dark .border-gray-300 {
+  border-color: #334155;
+}
+
+.dark .border-gray-200 {
+  border-color: #1e293b;
+}
+
+.dark .border-blue-200 {
+  border-color: #1e3a8a;
+}
+
+.dark .border-green-200 {
+  border-color: #14532d;
+}
+
+.dark .border-yellow-200 {
+  border-color: #713f12;
+}
+
+.dark .border-red-200 {
+  border-color: #7f1d1d;
+}
+
+.dark .border-orange-200 {
+  border-color: #7c2d12;
+}
+
+/* Hover States */
+.dark .hover\:bg-gray-50:hover {
+  background-color: #1e293b;
+}
+
+.dark .hover\:bg-gray-100:hover {
+  background-color: #334155;
+}
+
+.dark .hover\:bg-blue-50:hover {
+  background-color: rgba(30, 58, 138, 0.3);
+}
+
+.dark .hover\:bg-red-50:hover {
+  background-color: rgba(127, 29, 29, 0.3);
+}
+
+.dark .hover\:text-gray-900:hover {
+  color: #f3f4f6;
+}
+
+/* Shadows */
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+}
+
+/* Input Fields */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f3f4f6;
+}
+
+.dark input::placeholder {
+  color: #6b7280;
+}
+
+/* Select dropdown styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+.dark select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+}
+
+/* Select option styling */
+select {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+select::-webkit-scrollbar {
+  width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+select::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 4px;
+}
+
+.dark select::-webkit-scrollbar-thumb {
+  background-color: #475569;
+}
+
+select option {
+  background-color: white;
+  color: #1f2937;
+  padding: 0.625rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+select option:checked {
+  background: linear-gradient(#3b82f6, #3b82f6);
+  background-color: #3b82f6 !important;
+  color: white !important;
+  font-weight: 500;
+}
+
+.dark select option {
+  background-color: #1e293b;
+  color: #f3f4f6;
+}
+
+.dark select option:checked {
+  background: linear-gradient(#3b82f6, #3b82f6);
+  background-color: #3b82f6 !important;
+  color: white !important;
+  font-weight: 500;
+}
+
+/* Adjust select dropdown width */
+select[size],
+select[multiple] {
+  padding-right: 0.25rem;
+}
+
+/* Force options to fill width */
+select:focus option,
+select:active option {
+  padding-right: 0.25rem;
+}
+
+/* Better select focus state */
+select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dark select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Charts - Make them visible in dark mode */
+.dark .recharts-text {
+  fill: #e5e7eb !important;
+  font-weight: 500;
+}
+
+.dark .recharts-cartesian-axis-tick-value {
+  fill: #e5e7eb !important;
+}
+
+.dark .recharts-label {
+  fill: #f3f4f6 !important;
+  font-weight: 600;
+}
+
+.dark .recharts-cartesian-grid-horizontal line,
+.dark .recharts-cartesian-grid-vertical line {
+  stroke: #475569 !important;
+  stroke-opacity: 0.5;
+}
+
+.dark .recharts-tooltip-wrapper {
+  outline: none;
+}
+
+.dark .recharts-default-tooltip {
+  background-color: #1e293b !important;
+  border: 1px solid #475569 !important;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.dark .recharts-tooltip-label {
+  color: #f3f4f6 !important;
+  font-weight: 600;
+}
+
+.dark .recharts-tooltip-item {
+  color: #d1d5db !important;
+}
+
+.dark .recharts-tooltip-item-list {
+  padding: 0;
+  margin: 0;
+}
+
+/* Pie chart labels in dark mode */
+.dark .recharts-pie-label-text {
+  fill: #f3f4f6 !important;
+  font-weight: 500;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
