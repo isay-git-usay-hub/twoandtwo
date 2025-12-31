@@ -11,6 +11,18 @@ import { toast } from 'sonner'
 export default function Profile() {
     const { user, setUser } = useStore()
     const [loading, setLoading] = useState(true)
+    const [showEmailModal, setShowEmailModal] = useState(false)
+    const [showSecurityModal, setShowSecurityModal] = useState(false)
+    const [emailNotifications, setEmailNotifications] = useState({
+        budgetAlerts: true,
+        weeklyReports: true,
+        monthlyReports: false
+    })
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+    })
     const [stats, setStats] = useState({
         totalExpenses: 0,
         totalSpent: 0,
@@ -57,6 +69,38 @@ export default function Profile() {
         await supabase.auth.signOut()
         setUser(null)
         toast.success('Signed out successfully')
+    }
+
+    const handleEmailNotificationSave = () => {
+        // In a real app, you'd save these preferences to your database
+        toast.success('Email preferences updated!')
+        setShowEmailModal(false)
+    }
+
+    const handlePasswordChange = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            toast.error('New passwords do not match')
+            return
+        }
+
+        if (passwordData.newPassword.length < 6) {
+            toast.error('Password must be at least 6 characters')
+            return
+        }
+
+        try {
+            const { error } = await supabase.auth.updateUser({
+                password: passwordData.newPassword
+            })
+
+            if (error) throw error
+
+            toast.success('Password updated successfully!')
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+            setShowSecurityModal(false)
+        } catch (error: any) {
+            toast.error(error.message)
+        }
     }
 
     if (loading) {
@@ -130,7 +174,10 @@ export default function Profile() {
                 </div>
 
                 <div className="divide-y divide-gray-100 dark:divide-slate-800">
-                    <div className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
+                    <div 
+                        onClick={() => setShowEmailModal(true)}
+                        className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                    >
                         <div className="flex items-center gap-3">
                             <span className="text-gray-400">📧</span>
                             <div>
@@ -141,7 +188,10 @@ export default function Profile() {
                         <span className="text-gray-400">›</span>
                     </div>
 
-                    <div className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
+                    <div 
+                        onClick={() => setShowSecurityModal(true)}
+                        className="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                    >
                         <div className="flex items-center gap-3">
                             <span className="text-gray-400">🔒</span>
                             <div>
@@ -171,6 +221,139 @@ export default function Profile() {
                     two&two v1.0.0 • Last login: {stats.lastLogin}
                 </p>
             </div>
+
+            {/* Email Notifications Modal */}
+            {showEmailModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full">
+                        <div className="p-6 border-b border-gray-100 dark:border-slate-800">
+                            <h3 className="text-xl font-bold dark:text-white">Email Notifications</h3>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Choose what updates you'd like to receive</p>
+                        </div>
+                        
+                        <div className="p-6 space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="font-medium dark:text-white">Budget Alerts</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">Get notified when you exceed budget limits</p>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={emailNotifications.budgetAlerts}
+                                    onChange={(e) => setEmailNotifications(prev => ({ ...prev, budgetAlerts: e.target.checked }))}
+                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="font-medium dark:text-white">Weekly Reports</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">Weekly spending summary</p>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={emailNotifications.weeklyReports}
+                                    onChange={(e) => setEmailNotifications(prev => ({ ...prev, weeklyReports: e.target.checked }))}
+                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="font-medium dark:text-white">Monthly Reports</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">Monthly spending analysis</p>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={emailNotifications.monthlyReports}
+                                    onChange={(e) => setEmailNotifications(prev => ({ ...prev, monthlyReports: e.target.checked }))}
+                                    className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 border-t border-gray-100 dark:border-slate-800 flex gap-3">
+                            <button
+                                onClick={() => setShowEmailModal(false)}
+                                className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleEmailNotificationSave}
+                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Security Modal */}
+            {showSecurityModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full">
+                        <div className="p-6 border-b border-gray-100 dark:border-slate-800">
+                            <h3 className="text-xl font-bold dark:text-white">Security Settings</h3>
+                            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Update your password and security preferences</p>
+                        </div>
+                        
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium dark:text-white mb-2">Current Password</label>
+                                <input
+                                    type="password"
+                                    value={passwordData.currentPassword}
+                                    onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+                                    placeholder="Enter current password"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium dark:text-white mb-2">New Password</label>
+                                <input
+                                    type="password"
+                                    value={passwordData.newPassword}
+                                    onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+                                    placeholder="Enter new password"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium dark:text-white mb-2">Confirm New Password</label>
+                                <input
+                                    type="password"
+                                    value={passwordData.confirmPassword}
+                                    onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-white"
+                                    placeholder="Confirm new password"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 border-t border-gray-100 dark:border-slate-800 flex gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowSecurityModal(false)
+                                    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+                                }}
+                                className="flex-1 px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handlePasswordChange}
+                                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                Update Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
