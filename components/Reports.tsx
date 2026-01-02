@@ -31,9 +31,10 @@ export default function Reports() {
   const { categories } = useUserCategories()
   const [weeklyData, setWeeklyData] = useState<any>(null)
   const [monthlyData, setMonthlyData] = useState<any>(null)
+  const [allTimeData, setAllTimeData] = useState<{ year: number; total: number; count: number }[]>([])
   const [yearlyData, setYearlyData] = useState<MonthlySummary[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeReport, setActiveReport] = useState<'weekly' | 'monthly' | 'yearly'>('weekly')
+  const [activeReport, setActiveReport] = useState<'weekly' | 'monthly' | 'yearly' | 'all-time'>('weekly')
   const currentYear = new Date().getFullYear()
 
   useEffect(() => {
@@ -107,7 +108,7 @@ export default function Reports() {
     monthExpenses?.forEach(exp => {
       // Parse YYYY-MM-DD manually to avoid timezone issues
       let day: number
-      
+
       if (typeof exp.date === 'string') {
         const parts = exp.date.split('-')
         day = parts.length === 3 ? parseInt(parts[2], 10) : new Date(exp.date).getDate()
@@ -138,15 +139,16 @@ export default function Reports() {
       status: monthTotal > (budget?.total_budget || 0) ? 'red' : monthTotal > (budget?.total_budget || 0) * 0.8 ? 'yellow' : 'green'
     })
 
-    // Yearly Report
-    const { data: summaries } = await supabase
+    // Yearly & All Time Reports
+    // Fetch ALL monthly summaries to support both
+    const { data: allSummaries } = await supabase
       .from('monthly_summaries')
       .select('*')
       .eq('user_id', user.id)
-      .eq('year', year)
-      .order('month')
+      .order('year', { ascending: true })
+      .order('month', { ascending: true })
 
-    // Include current month data even if not in summaries yet
+    // Include current month data
     const currentMonthSummary: MonthlySummary = {
       id: 'current',
       user_id: user.id,
@@ -157,15 +159,33 @@ export default function Reports() {
       category_breakdown: {}
     }
 
-    // Merge summaries with current month, avoiding duplicates
-    const allMonths = [...(summaries || [])]
-    const hasCurrentMonth = allMonths.some(s => s.month === month && s.year === year)
+    // Merge summaries with current month for calculations
+    const mergedSummaries = [...(allSummaries || [])]
+    const hasCurrentMonth = mergedSummaries.some(s => s.month === month && s.year === year)
+
     if (!hasCurrentMonth && monthTotal > 0) {
-      allMonths.push(currentMonthSummary)
-      allMonths.sort((a, b) => a.month - b.month)
+      mergedSummaries.push(currentMonthSummary)
     }
 
-    setYearlyData(allMonths)
+    // 1. Prepare Yearly Data (Current Year Only)
+    const currentYearSummaries = mergedSummaries
+      .filter(s => s.year === year)
+      .sort((a, b) => a.month - b.month)
+
+    setYearlyData(currentYearSummaries)
+
+    // 2. Prepare All Time Data (Grouped by Year)
+    const yearGroups = mergedSummaries.reduce((acc, curr) => {
+      if (!acc[curr.year]) {
+        acc[curr.year] = { year: curr.year, total: 0, count: 0 }
+      }
+      acc[curr.year].total += parseFloat(curr.total_spent.toString())
+      acc[curr.year].count += 1
+      return acc
+    }, {} as Record<number, { year: number; total: number; count: number }>)
+
+    setAllTimeData((Object.values(yearGroups) as { year: number; total: number; count: number }[]).sort((a, b) => a.year - b.year))
+
     setLoading(false)
   }
 
@@ -190,17 +210,17 @@ export default function Reports() {
   return (
     <div>
       {/* Report Tabs */}
-      <div className="flex gap-2 mb-6 bg-white dark:bg-slate-900 p-1.5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800">
-        {(['weekly', 'monthly', 'yearly'] as const).map((tab) => (
+      <div className="flex gap-2 mb-6 bg-white dark:bg-slate-900 p-1.5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 overflow-x-auto">
+        {(['weekly', 'monthly', 'yearly', 'all-time'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveReport(tab)}
-            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all capitalize ${activeReport === tab
+            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all capitalize whitespace-nowrap ${activeReport === tab
               ? 'bg-blue-600 text-white shadow-md'
               : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800'
               }`}
           >
-            {tab}
+            {tab === 'all-time' ? 'All Time' : tab}
           </button>
         ))}
       </div>
@@ -438,6 +458,82 @@ export default function Reports() {
                         />
                       ))}
                     </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* All Time Report */}
+      {activeReport === 'all-time' && (
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <h3 className="text-xl font-bold mb-2 dark:text-white">Annual Spending Overview</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+            Compare your spending across different years
+          </p>
+          {allTimeData.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="bg-gray-100 dark:bg-slate-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">📊</span>
+              </div>
+              <p className="text-gray-500 dark:text-gray-400">No annual data available</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">Total Years</p>
+                  <p className="text-2xl font-bold dark:text-white">{allTimeData.length}</p>
+                </div>
+                <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">Lifetime Spent</p>
+                  <p className="text-2xl font-bold dark:text-white">
+                    {formatCurrency(allTimeData.reduce((sum, y) => sum + y.total, 0))}
+                  </p>
+                </div>
+                <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-xl">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold mb-1">Average/Year</p>
+                  <p className="text-2xl font-bold dark:text-white">
+                    {formatCurrency(allTimeData.reduce((sum, y) => sum + y.total, 0) / allTimeData.length)}
+                  </p>
+                </div>
+              </div>
+              <div className="h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={allTimeData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" className="dark:stroke-slate-700" />
+                    <XAxis
+                      dataKey="year"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#6b7280', fontSize: 12 }}
+                      dy={10}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#6b7280', fontSize: 12 }}
+                      tickFormatter={(value) => `₹${value}`}
+                    />
+                    <Tooltip
+                      cursor={{ fill: 'transparent' }}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload
+                          return (
+                            <div className="bg-white dark:bg-slate-800 p-3 border border-gray-200 dark:border-slate-700 rounded-lg shadow-lg">
+                              <p className="font-semibold dark:text-white">{data.year}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-300">Total Spent: {formatCurrency(data.total)}</p>
+                              <p className="text-xs text-gray-500 mt-1">Months tracked: {data.count}</p>
+                            </div>
+                          )
+                        }
+                        return null
+                      }}
+                    />
+                    <Bar dataKey="total" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

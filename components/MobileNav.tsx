@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, BarChart2, PlusCircle, User } from 'lucide-react'
+import { Home, BarChart2, PlusCircle, User, Settings } from 'lucide-react'
 
 interface MobileNavProps {
     activeTab: 'dashboard' | 'reports' | 'profile'
@@ -28,6 +28,15 @@ export default function MobileNav({
                 </button>
 
                 <button
+                    onClick={() => onTabChange('reports')}
+                    className={`flex flex-col items-center gap-1 ${activeTab === 'reports' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
+                        }`}
+                >
+                    <BarChart2 size={24} />
+                    <span className="text-[10px] font-medium">Reports</span>
+                </button>
+
+                <button
                     onClick={onAddClick}
                     className="flex flex-col items-center gap-1 -mt-8"
                 >
@@ -38,12 +47,11 @@ export default function MobileNav({
                 </button>
 
                 <button
-                    onClick={() => onTabChange('reports')}
-                    className={`flex flex-col items-center gap-1 ${activeTab === 'reports' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400'
-                        }`}
+                    onClick={onSettingsClick}
+                    className="flex flex-col items-center gap-1 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
                 >
-                    <BarChart2 size={24} />
-                    <span className="text-[10px] font-medium">Reports</span>
+                    <Settings size={24} />
+                    <span className="text-[10px] font-medium">Cats</span>
                 </button>
 
                 <button

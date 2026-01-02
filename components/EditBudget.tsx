@@ -9,11 +9,11 @@ import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import Input from './ui/Input'
 
-export default function EditBudget({ 
-  budget, 
-  onClose, 
-  onUpdate 
-}: { 
+export default function EditBudget({
+  budget,
+  onClose,
+  onUpdate
+}: {
   budget: Budget;
   onClose: () => void;
   onUpdate: () => void;
@@ -87,8 +87,8 @@ export default function EditBudget({
         exit={{ scale: 0.95, opacity: 0 }}
         className="relative bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto"
       >
-        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-6 flex justify-between items-center">
-          <h2 className="text-2xl font-bold dark:text-white">Edit Budget</h2>
+        <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 p-4 md:p-6 flex justify-between items-center">
+          <h2 className="text-xl md:text-2xl font-bold dark:text-white">Edit Budget</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
@@ -97,7 +97,7 @@ export default function EditBudget({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 md:p-6 space-y-4 md:space-y-6">
           <div>
             <Input
               label="Total Monthly Budget *"
