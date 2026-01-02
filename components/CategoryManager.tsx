@@ -68,7 +68,7 @@ export default function CategoryManager({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center z-50 p-0 md:p-4">
-      <div className="bg-white dark:bg-slate-900 w-full md:w-auto md:max-w-2xl h-[95vh] md:h-auto md:max-h-[90vh] rounded-t-2xl md:rounded-2xl shadow-xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 md:fade-in md:zoom-in-95 duration-200">
+      <div className="bg-white dark:bg-slate-900 w-full md:w-auto md:max-w-2xl h-[90dvh] md:h-auto md:max-h-[90vh] rounded-t-2xl md:rounded-2xl shadow-xl overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 md:fade-in md:zoom-in-95 duration-200">
         <div className="p-4 md:p-6 border-b border-gray-200 dark:border-slate-800 flex-shrink-0">
           <div className="flex justify-between items-center">
             <div>
@@ -122,7 +122,7 @@ export default function CategoryManager({ onClose }: { onClose: () => void }) {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-[calc(100vh-400px)] md:max-h-96 overflow-y-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:max-h-96 md:overflow-y-auto">
               {categories.map((cat, index) => (
                 <div
                   key={cat}
